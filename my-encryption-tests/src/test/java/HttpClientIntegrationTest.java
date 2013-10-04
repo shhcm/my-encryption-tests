@@ -6,7 +6,7 @@ import org.junit.Test;
 import com.encryption.testing.client.HttpClient;
 
 
-public class HttpClientTest {
+public class HttpClientIntegrationTest {
     private HttpClient httpClient;
     
     @Before
@@ -14,6 +14,7 @@ public class HttpClientTest {
         httpClient = new HttpClient();
     }
     
+    // TODO: Do not assume that the server is running, post to some example webpage on the net.
     @Test
     public void canPostToSpringController() {
         // Given
