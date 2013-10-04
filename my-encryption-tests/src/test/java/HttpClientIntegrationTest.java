@@ -5,6 +5,9 @@ import org.junit.Test;
 
 import com.encryption.testing.client.HttpClient;
 
+/*
+ * Test requires jetty to be running. 
+ **/
 
 public class HttpClientIntegrationTest {
     private HttpClient httpClient;
@@ -14,7 +17,6 @@ public class HttpClientIntegrationTest {
         httpClient = new HttpClient();
     }
     
-    // TODO: Do not assume that the server is running, post to some example webpage on the net.
     @Test
     public void canPostToSpringController() {
         // Given
