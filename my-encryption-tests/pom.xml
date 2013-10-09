@@ -95,6 +95,13 @@
             <version>6.1.10</version>
             <configuration>
               <scanIntervalSeconds>10</scanIntervalSeconds>
+              <!-- Used to stop jetty in the post integration test phase -->
+              <stopPort>8005</stopPort>
+          	  <stopKey>STOP</stopKey>
+          	  <!-- Context of the application in tomcat container needs to be added here! -->
+          	  <contextPath>/my-encryption-testing</contextPath>
+          	  <!-- End integration test config. -->
+              
               <connectors>
                 <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
                   <port>8888</port>
@@ -102,7 +109,42 @@
                 </connector>
               </connectors>
             </configuration>
+            
+            <!--  Start jetty before integration test phase, see http://docs.codehaus.org/display/MAVENUSER/Maven+and+Integration+Testing -->
+            <executions>
+	          <execution>
+	            <id>start-jetty</id>
+	            <phase>pre-integration-test</phase>
+	            <goals>
+	              <goal>run</goal>
+	            </goals>
+	            <configuration>
+	              <scanIntervalSeconds>0</scanIntervalSeconds>
+	              <daemon>true</daemon>
+	            </configuration>
+	          </execution>
+	          <execution>
+	            <id>stop-jetty</id>
+	            <phase>post-integration-test</phase>
+	            <goals>
+	              <goal>stop</goal>
+	            </goals>
+	          </execution>
+	        </executions>
           </plugin>
+          <!-- maven failsafe plugin is needed for integration testing -->
+          <plugin>
+	        <artifactId>maven-failsafe-plugin</artifactId>
+	        <version>2.6</version>
+	        <executions>
+	          <execution>
+	            <goals>
+	              <goal>integration-test</goal>
+	              <goal>verify</goal>
+	            </goals>
+	          </execution>
+	        </executions>
+	      </plugin>
     </plugins>
   </build>
 </project>

@@ -19,7 +19,8 @@ import static org.apache.commons.io.IOUtils.copy;
 public class HttpClient {
     
     public String postToController(String uri, String postRequestBody) {
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        // TODO: transmit an xml entity that should be encrypted by the client.
+    	HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         CloseableHttpClient httpClient = httpClientBuilder.build();
         
         HttpPost request = new HttpPost(uri);
@@ -37,7 +38,6 @@ public class HttpClient {
             HttpResponse response = httpClient.execute(request);
             StringWriter stringWriter = new StringWriter();
             copy(response.getEntity().getContent(), stringWriter);
-            
             return stringWriter.toString();
             
         } catch (ClientProtocolException e) {
