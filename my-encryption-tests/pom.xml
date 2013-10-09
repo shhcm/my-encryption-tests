@@ -98,9 +98,10 @@
               <!-- Used to stop jetty in the post integration test phase -->
               <stopPort>8005</stopPort>
           	  <stopKey>STOP</stopKey>
-          	  <!-- Context of the application in tomcat container needs to be added here! -->
-          	  <contextPath>/my-encryption-testing</contextPath>
-          	  <!-- End integration test config. -->
+          	  <!-- Correct context of the application in tomcat container needs to be added here!
+          	  Can be omitted if context should be the final name per default. -->
+          	  <!-- 
+          	  <contextPath>/my-encryption-testing</contextPath> -->
               
               <connectors>
                 <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
