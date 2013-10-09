@@ -9,7 +9,7 @@ import com.encryption.testing.client.HttpClient;
  * Test requires jetty to be running. 
  **/
 
-public class HttpClientIntegrationITCase {
+public class HttpClientITCase {
     private HttpClient httpClient;
     
     @Before
