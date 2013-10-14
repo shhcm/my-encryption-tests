@@ -3,27 +3,39 @@ package com.encryption.testing.controller;
 import java.io.IOException;
 import java.io.Writer;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.util.encoders.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.apache.xml.security.keys.KeyInfo;
-import org.apache.xml.security.encryption.XMLCipher;
-import org.bouncycastle.*;
 
+
+@Service
 @Controller
 @RequestMapping("/")
-
 public class BaseController {
+    
+    private PublicKeyRepository publicKeyRepository;
+    
+    @Autowired
+    public void setPublicKeyRepository(PublicKeyRepository publicKeyRepository) {
+        // The public key repository needs to have access to BouncyCastle crypto implementation. 
+        java.security.Security.addProvider(new BouncyCastleProvider());
+        this.publicKeyRepository = publicKeyRepository;
+    }
+    
     @RequestMapping(value="welcome", method=RequestMethod.GET)
     public String welcome(ModelMap model) {
         model.addAttribute("subject", "Testing XML Encryption");
         //Spring uses InternalResourceViewResolver and returns back index.jsp
         return "index";
     }
-    
+
     @RequestMapping(value="getEncryptionDetails", method=RequestMethod.POST)
     public String getsetEncryptionDetails(
             @RequestParam(value="mode") String mode,
@@ -39,6 +51,18 @@ public class BaseController {
             // TODO: lookup this method signature, why writer contains the http response.
             writer.write(requestBody);
         } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+    
+    @RequestMapping(value="getPublicKey", method=RequestMethod.GET)
+    public void getPublicKey(
+            @RequestParam(value="securityParameter") int securityParameter,
+            Writer writer) {
+        try {
+            byte[] encodedBytes = Base64.encode(publicKeyRepository.getPublicKey(securityParameter).getEncoded());
+            writer.write(new String(encodedBytes));
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
     }

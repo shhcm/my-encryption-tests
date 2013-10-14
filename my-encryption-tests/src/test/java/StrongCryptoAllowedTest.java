@@ -35,7 +35,7 @@ public class StrongCryptoAllowedTest {
     
     @Before
     public void setUp() {
-        // Set up 16 byte initalisation vector.
+        // Set up 16 byte initialisation vector.
         iv = "0123456789123456".getBytes();
     }
     

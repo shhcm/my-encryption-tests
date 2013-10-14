@@ -15,6 +15,13 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 import static org.apache.commons.io.IOUtils.copy;
 
+/*
+ *
+ * TODO: Generate an asymetric key pair in the controller, that can be retrieved by the client.
+ * The client should then send an encrypted xml message to the controller, that only the
+ * controller is able to decrypt.
+ * 
+ **/
 
 public class HttpClient {
     
@@ -46,5 +53,10 @@ public class HttpClient {
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
+    }
+    
+    public String getPublicKeyFromController(String uri, String securityParameter) {
+        // TODO
+        return "";
     }
 }

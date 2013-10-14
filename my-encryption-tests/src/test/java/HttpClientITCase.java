@@ -6,7 +6,8 @@ import org.junit.Test;
 import com.encryption.testing.client.HttpClient;
 
 /*
- * Test requires jetty to be running. 
+ * Test requires jetty to be running.
+ * TODO: add test for retrieving the public key.
  **/
 
 public class HttpClientITCase {
