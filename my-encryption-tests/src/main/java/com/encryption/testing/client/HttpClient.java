@@ -1,7 +1,12 @@
 package com.encryption.testing.client;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -48,10 +53,12 @@ public class HttpClient implements ClientInterface {
         
         try {
             HttpResponse response = httpClient.execute(request);
-            StringWriter stringWriter = new StringWriter();
-            copy(response.getEntity().getContent(), stringWriter);
-            return stringWriter.toString();
-            
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            encInputStream2EncOutputStream( response.getEntity().getContent(),
+                                            "utf-8",
+                                            byteArrayOutputStream,
+                                            "utf-8");
+            return new String(byteArrayOutputStream.toByteArray());
         } catch (ClientProtocolException e) {
             throw new RuntimeException(e.getMessage());
         } catch (IOException e) {
@@ -61,16 +68,18 @@ public class HttpClient implements ClientInterface {
     @Override
     public String getPublicKeyFromController(String uri, int securityParameter) {
         CloseableHttpClient httpClient = httpClientBuilder.build();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         
         try {
-            URIBuilder uriBuilder = new URIBuilder(uri).addParameter("securityParameter", ""+securityParameter);
+            URIBuilder uriBuilder = new URIBuilder(uri).addParameter("securityParameter", "" + securityParameter);
             HttpGet request = new HttpGet(uriBuilder.build());
-
             HttpResponse response = httpClient.execute(request);
-            StringWriter stringWriter = new StringWriter();
-            copy(response.getEntity().getContent(), stringWriter);
-            return stringWriter.toString();
             
+            // Generic method to write from some InputStream to some OutputStream while specifying input and output encoding manually.
+            encInputStream2EncOutputStream( response.getEntity().getContent(),
+                                            "utf-8",
+                                            byteArrayOutputStream,
+                                            "utf-8");
         } catch (URISyntaxException e) {
             throw new RuntimeException(e.getMessage());
         } catch (ClientProtocolException e) {
@@ -78,5 +87,21 @@ public class HttpClient implements ClientInterface {
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
+        
+
+        return new String(byteArrayOutputStream.toByteArray());
+    }
+    
+    static void encInputStream2EncOutputStream( InputStream inputStream,
+                                                String inputEncoding,
+                                                OutputStream outputStream,
+                                                String outputEncoding) throws IOException  {
+        // Generic method to write from some InputStream to some OutputStream while specifying input and output encoding manually.
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, inputEncoding);
+        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, outputEncoding);
+        copy(inputStreamReader, outputStreamWriter);
+        inputStreamReader.close();
+        outputStreamWriter.flush();
+        outputStreamWriter.close();
     }
 }
