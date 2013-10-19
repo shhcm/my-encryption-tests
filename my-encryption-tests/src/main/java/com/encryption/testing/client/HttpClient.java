@@ -20,6 +20,9 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import static org.apache.commons.io.IOUtils.copy;
 
@@ -91,8 +94,11 @@ public class HttpClient implements ClientInterface {
         return new String(byteArrayOutputStream.toByteArray());
     }
     
-    static void prepareXmlEncryptionMessage(byte[] publicKey, String message ) {
-        // TODO.
+    static void prepareXmlEncryptionMessage(byte[] publicKey, Document message ) {
+        NodeList nodeList = message.getElementsByTagName("encrypted-part");
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            
+        }
     }
     
     static void encInputStream2EncOutputStream( InputStream inputStream,
