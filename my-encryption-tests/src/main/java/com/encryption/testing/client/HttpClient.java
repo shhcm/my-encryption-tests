@@ -87,9 +87,12 @@ public class HttpClient implements ClientInterface {
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
-        
 
         return new String(byteArrayOutputStream.toByteArray());
+    }
+    
+    static void prepareXmlEncryptionMessage(byte[] publicKey, String message ) {
+        // TODO.
     }
     
     static void encInputStream2EncOutputStream( InputStream inputStream,
