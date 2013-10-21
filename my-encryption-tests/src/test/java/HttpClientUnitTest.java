@@ -6,11 +6,11 @@ import static org.hamcrest.Matchers.endsWith;
 public class HttpClientUnitTest {
 
     @Test
-    public void canReplacesSecretElementsCorrectly() {
+    public void canReplaceSecretElementsCorrectly() {
         // Given
         String xmlFile = getClass().getResource("/com/encryption/testing/messages/DummyMessage.xml").getFile();
         // When
-        //TODO
+        
         // Then
         assertThat(xmlFile, endsWith("DummyMessage.xml"));
     }

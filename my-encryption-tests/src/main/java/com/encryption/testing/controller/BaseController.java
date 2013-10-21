@@ -60,6 +60,9 @@ public class BaseController {
             @RequestParam(value="securityParameter") int securityParameter,
             Writer writer) {
         try {
+            // The primary key encoding format must be known by the HttpClient in order to reinstantiate a public key from its encoding.
+            // TODO: sent this information together with the algorithm name to the client.
+            System.out.println(publicKeyRepository.getPublicKey(securityParameter).getFormat());
             byte[] encodedBytes = Base64.encode(publicKeyRepository.getPublicKey(securityParameter).getEncoded());
             writer.write(new String(encodedBytes));
         } catch (Exception e) {
