@@ -24,7 +24,7 @@ public class HttpClientITCase {
         // Given
         
         // When
-        String response = httpClient.postToController("http://localhost:8888/my-encryption-testing/getEncryptedExample", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?><xml>bla</xml>");
+        String response = httpClient.postToController("http://localhost:8888/my-encryption-testing/getExample", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?><xml>bla</xml>");
         // Then
         assertEquals(response, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?><xml>bla</xml>");
         System.out.println(response);

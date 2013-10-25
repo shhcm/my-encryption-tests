@@ -1,6 +1,7 @@
 package com.encryption.testing.helpers;
 
 import java.io.FileInputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -34,6 +35,18 @@ import org.xml.sax.InputSource;
 
 @Component
 public class XMLEncryptionHelper {
+    
+    public static Document loadXMLFromString(String xml) {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            return builder.parse(new InputSource(new StringReader(xml)));
+        } catch(Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+    
     public static Document loadXMLFromFile(String file) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

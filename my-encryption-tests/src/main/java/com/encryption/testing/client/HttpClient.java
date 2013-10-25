@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.EntityBuilder;
@@ -18,6 +19,8 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.w3c.dom.Document;
+
 import static org.apache.commons.io.IOUtils.copy;
 
 /*
@@ -86,6 +89,13 @@ public class HttpClient implements ClientInterface {
         }
         
         return new String(byteArrayOutputStream.toByteArray());
+    }
+    
+    @Override
+    public String postEncryptedXml(String uri, Document document) {
+        CloseableHttpClient httpClient = httpClientBuilder.build();
+        // TODO;
+        return "";
     }
     
     static void encInputStream2EncOutputStream( InputStream inputStream,
