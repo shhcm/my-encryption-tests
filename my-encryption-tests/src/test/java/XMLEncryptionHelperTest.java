@@ -3,12 +3,10 @@ import static org.junit.Assert.assertTrue;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
-import com.encryption.testing.client.HttpClient;
 import com.encryption.testing.helpers.XMLEncryptionHelper;
 
 import static org.hamcrest.Matchers.endsWith;
