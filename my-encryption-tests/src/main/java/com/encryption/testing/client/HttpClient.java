@@ -7,16 +7,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.EntityBuilder;
@@ -26,23 +18,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.xml.security.encryption.XMLCipher;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.util.PublicKeyFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-
-
-
-
-
-
-
-
-
-
 import static org.apache.commons.io.IOUtils.copy;
 
 /*
@@ -111,31 +86,6 @@ public class HttpClient implements ClientInterface {
         }
         
         return new String(byteArrayOutputStream.toByteArray());
-    }
-    
-    static void prepareXmlEncryptionMessage(byte[] publicKey, Document message ) {
-        
-        /*PublicKey pubKey = keyFactory.generatePublic(publicKey);
-        PublicKey keyEncryptionKey = new PublicKey();
-        XMLCipher xmlCipher = XMLCipher.getInstance();
-        xmlCipher.init(WRAP_MODE,);
-        EncryptedData encryptedDataElement = xmlCipher.*/
-        try {
-            // Create a key object for the rsa key encryption key.
-            // Key information (algorithm, encoding format) should be retrieved from server as well, instead of hardcodig this here.
-            X509EncodedKeySpec keySpecKeyEncryption = new X509EncodedKeySpec(publicKey);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA", "BC");
-            PublicKey keyEncryptionKey = keyFactory.generatePublic(keySpecKeyEncryption);
-            // TODO: generate the enrypted XML document with this public Key
-            
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchProviderException e) {
-            throw new RuntimeException(e);
-        } catch (InvalidKeySpecException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
     
     static void encInputStream2EncOutputStream( InputStream inputStream,

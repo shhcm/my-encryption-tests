@@ -83,7 +83,7 @@ public class StrongCryptoAllowedTest {
             serpentKeyGenerator.init(256);
             serpentKey = serpentKeyGenerator.generateKey();
             IvParameterSpec ips = new IvParameterSpec(iv);
-            Cipher cipher = Cipher.getInstance("serpent/CBC/PKCS7Padding");
+            Cipher cipher = Cipher.getInstance("serpent/CBC/PKCS7Padding", "BC");
             // When
             byte[] data = "A simple string".getBytes();
             cipher.init(Cipher.ENCRYPT_MODE, serpentKey, ips);
@@ -118,7 +118,7 @@ public class StrongCryptoAllowedTest {
             KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("rsa", "BC");
             keyPairGen.initialize(2048);
             KeyPair keyPair = keyPairGen.generateKeyPair();
-            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding", "BC");
             
             // When
             byte[] data = "A simple string".getBytes();
