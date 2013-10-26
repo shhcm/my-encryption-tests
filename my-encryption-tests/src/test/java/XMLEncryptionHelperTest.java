@@ -27,7 +27,7 @@ public class XMLEncryptionHelperTest {
         String xmlFile = getClass().getResource("/com/encryption/testing/messages/DummyMessage.xml").getFile();
         Document documentToEncrypt = XMLEncryptionHelper.loadXMLFromFile(xmlFile);
         // When
-        Document processedDocument = XMLEncryptionHelper.prepareXmlEncryptionMessage(publicKey, documentToEncrypt);
+        Document processedDocument = XMLEncryptionHelper.encrytUsingRSA(publicKey, documentToEncrypt);
         // Then
         assertThat(xmlFile, endsWith("DummyMessage.xml"));
         assertTrue(processedDocument.getElementsByTagName("xenc:EncryptedData").getLength() > 0);

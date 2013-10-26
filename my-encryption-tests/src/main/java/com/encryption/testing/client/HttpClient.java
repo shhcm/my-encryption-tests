@@ -21,6 +21,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.w3c.dom.Document;
 
+import com.encryption.testing.helpers.XMLEncryptionHelper;
+
 import static org.apache.commons.io.IOUtils.copy;
 
 /*
@@ -37,7 +39,6 @@ public class HttpClient implements ClientInterface {
     
     @Override
     public String postToController(String uri, String postRequestBody) {
-        // TODO: transmit an xml entity that should be encrypted by the client.
         CloseableHttpClient httpClient = httpClientBuilder.build();
         
         HttpPost request = new HttpPost(uri);
@@ -93,9 +94,33 @@ public class HttpClient implements ClientInterface {
     
     @Override
     public String postEncryptedXml(String uri, Document document) {
+        // TODO: Refactor.
         CloseableHttpClient httpClient = httpClientBuilder.build();
-        // TODO;
-        return "";
+        String xml = XMLEncryptionHelper.documentToXmlString(document);
+        HttpPost request = new HttpPost(uri);
+        
+        EntityBuilder entityBuilder = EntityBuilder.create();
+        entityBuilder.setText(xml);
+        
+        Charset charset = Charset.forName("UTF-8");
+        ContentType contentType = ContentType.create("application/xml", charset);
+        entityBuilder.setContentType(contentType);
+        
+        request.setEntity(entityBuilder.build());
+        
+        try {
+            HttpResponse response = httpClient.execute(request);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            encInputStream2EncOutputStream( response.getEntity().getContent(),
+                                            "utf-8",
+                                            byteArrayOutputStream,
+                                            "utf-8");
+            return new String(byteArrayOutputStream.toByteArray());
+        } catch (ClientProtocolException e) {
+            throw new RuntimeException(e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
     
     static void encInputStream2EncOutputStream( InputStream inputStream,

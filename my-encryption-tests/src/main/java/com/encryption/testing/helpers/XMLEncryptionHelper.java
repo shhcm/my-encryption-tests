@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
@@ -15,7 +16,6 @@ import javax.crypto.SecretKey;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -31,6 +31,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+
+import org.apache.xml.security.utils.EncryptionConstants;
 
 
 @Component
@@ -73,7 +75,7 @@ public class XMLEncryptionHelper {
         return writer.toString();
     }
     
-    public static Document prepareXmlEncryptionMessage(byte[] publicKey, Document message ) {
+    public static Document encrytUsingRSA(byte[] publicKey, Document message ) {
         
         
         try {
@@ -93,7 +95,7 @@ public class XMLEncryptionHelper {
                 return null;
             }
             // Now encrypt the part of the document.
-            XMLCipher xmlCipher = XMLCipher.getInstance(XMLCipher.AES_256);
+            XMLCipher xmlCipher = XMLCipher.getProviderInstance(XMLCipher.AES_256, "BC");
             xmlCipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
             EncryptedData encyptedDataElement = xmlCipher.getEncryptedData(); // Configure the encryptedData element.
             encyptedDataElement.setKeyInfo(keyInfoElement);
@@ -111,12 +113,31 @@ public class XMLEncryptionHelper {
             throw new RuntimeException(e);
         }
     }
+    
+    public static Document decryptUsingRSA(PrivateKey privateKey, Document message) {
+        String namespaceURI = EncryptionConstants.EncryptionSpecNS;
+        String encryptedDataTagName = EncryptionConstants._TAG_ENCRYPTEDDATA;
+        if(message.getElementsByTagNameNS(namespaceURI, encryptedDataTagName).getLength() != 1) {
+            throw new RuntimeException("Expected exactly one encryptedData element.");
+        }
+        Element encryptedDataElement = (Element) message.getElementsByTagNameNS(namespaceURI, encryptedDataTagName).item(0);
+        try {
+            XMLCipher xmlCipher = XMLCipher.getInstance();
+            xmlCipher.init(XMLCipher.DECRYPT_MODE, null);
+            xmlCipher.setKEK(privateKey);
+            return xmlCipher.doFinal(message, encryptedDataElement);
+        } catch (XMLEncryptionException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-    private static KeyInfo prepareKeyInfo(  Document message,
+    private static KeyInfo prepareKeyInfo( Document message,
             PublicKey keyEncryptionKey,
             SecretKey symmetricKey)
     throws XMLEncryptionException {
-        XMLCipher keyCipher = XMLCipher.getInstance(XMLCipher.RSA_OAEP);
+        XMLCipher keyCipher = XMLCipher.getProviderInstance(XMLCipher.RSA_OAEP, "BC");
         keyCipher.init(XMLCipher.WRAP_MODE, keyEncryptionKey);
         EncryptedKey encryptedKey = keyCipher.encryptKey(message, symmetricKey);
         KeyInfo keyInfoElement = new KeyInfo(message);

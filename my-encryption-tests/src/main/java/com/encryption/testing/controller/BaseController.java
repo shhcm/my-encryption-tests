@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import com.encryption.testing.helpers.XMLEncryptionHelper;
 
@@ -23,13 +25,17 @@ import com.encryption.testing.helpers.XMLEncryptionHelper;
 @RequestMapping("/")
 public class BaseController {
     
-    private PublicKeyRepository publicKeyRepository;
+    static {
+        org.apache.xml.security.Init.init();
+    }
+    
+    private KeyPairRepository keyPairRepository;
     
     @Autowired
-    public void setPublicKeyRepository(PublicKeyRepository publicKeyRepository) {
+    public void setPublicKeyRepository(KeyPairRepository publicKeyRepository) {
         // The public key repository needs to have access to BouncyCastle crypto implementation. 
         java.security.Security.addProvider(new BouncyCastleProvider());
-        this.publicKeyRepository = publicKeyRepository;
+        this.keyPairRepository = publicKeyRepository;
     }
     
     @RequestMapping(value="welcome", method=RequestMethod.GET)
@@ -51,7 +57,6 @@ public class BaseController {
     public void getExample(
             @RequestBody String requestBody, Writer writer) {
         try {
-            // TODO: lookup this method signature, why writer contains the http response.
             writer.write(requestBody);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
@@ -68,12 +73,31 @@ public class BaseController {
      * Send back the decrypted part of the message to prove that the
      * encryption works.
      */
-    @RequestMapping(value="processEncrypted", method=RequestMethod.POST)
+    @RequestMapping(value="decryptEncrypted", method=RequestMethod.POST)
     public void processEncrypted(
             @RequestBody String requestBody, Writer writer) {
-        // we expect the xml to be contained in the request Body.
+
         Document encryptedDoc = XMLEncryptionHelper.loadXMLFromString(requestBody);
-        //XMLEncryptionHelper.decryptXML(encryptedDoc, KeyPair asymetricKey);
+        NodeList nodeList = encryptedDoc.getElementsByTagName("security-parameter");
+        if(nodeList.getLength() != 1) {
+            try {
+                writer.write("Unexpected format: security parameter is missing or not unique.");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        Element securityParameterElement = (Element) nodeList.item(0);
+        securityParameterElement.getAttribute("value");
+        int securityParameter = Integer.parseInt(securityParameterElement.getAttribute("value"));
+        
+        Document decryptedDoc = XMLEncryptionHelper.decryptUsingRSA(
+                                    keyPairRepository.getPrivateKey(securityParameter),
+                                    encryptedDoc);
+        try {
+            writer.write(XMLEncryptionHelper.documentToXmlString(decryptedDoc));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     
     @RequestMapping(value="getPublicKey", method=RequestMethod.GET)
@@ -83,8 +107,7 @@ public class BaseController {
         try {
             // The primary key encoding format must be known by the HttpClient in order to reinstantiate a public key from its encoding.
             // TODO: sent this information together with the algorithm name to the client.
-            System.out.println(publicKeyRepository.getPublicKey(securityParameter).getFormat());
-            byte[] encodedBytes = Base64.encode(publicKeyRepository.getPublicKey(securityParameter).getEncoded());
+            byte[] encodedBytes = Base64.encode(keyPairRepository.getPublicKey(securityParameter).getEncoded());
             writer.write(new String(encodedBytes));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());

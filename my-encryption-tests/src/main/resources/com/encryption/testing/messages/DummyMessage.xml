@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <message xmlns="com.encryption.testing">
     <unencrypted-part>visible to public</unencrypted-part>
-    <security-parameter value="512"/>
-    <encrypted-part addidtional-info="OTHER SECRET" >SECRET</encrypted-part>
+    <security-parameter value="4096"/>
+    <encrypted-part addidtional-secret="OTHER SECRET" >SECRET</encrypted-part>
 </message>
